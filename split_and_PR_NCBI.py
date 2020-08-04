@@ -43,6 +43,7 @@ def retrieval():
     p=len(v)
     for i in range(p):
         v[i]=v[i].replace('\n','') #replacing the newlines by empty strings
+        #remove the comment notation from one or more of the following four comment lines accordingly if you need to study a part of the sequence for all cases and not whole
         #v[i]=v[i][291:794]
         #start_index=v[i].find('IRCI')
         #end_index=v[i].find('AVSA')
