@@ -111,8 +111,4 @@ with open(f'{z}/best_results.csv', 'a+', newline='') as csvFile:
 csvFile.close()
 #print(mean1)
 max1=rel[0]
-#start=relation.index(rel[0])
-#for a in range(3):
- #   s2=amino[a][start: start+window_s]
-  #  print(s2)
 print(len(mvav))
