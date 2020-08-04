@@ -109,6 +109,5 @@ with open(f'{z}/best_results.csv', 'a+', newline='') as csvFile:
             writer.writerow([str(i+1), str(p+1), str(rel[i]), str(pr1[p]), sts[0], sts[1], sts[2]])
             sts=[]
 csvFile.close()
-#print(mean1)
 max1=rel[0]
 print(len(mvav))
