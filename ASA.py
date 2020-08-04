@@ -57,28 +57,23 @@ with open(f'{z}/moving-average_coord.csv', 'a+', newline='') as csvFile1:
 csvFile1.close()
 
 diff, relation, pr1=[], [], []
-with open(f'{s}/coord.csv', 'r', newline='') as csvFile:
+with open(f'{z}/pr_coord.csv', 'r', newline='') as csvFile:
     reader=csv.reader(csvFile)
     print(reader)
     i=0
     for row in reader:
-        pr=int(row[1])
-        pr1.append(int(row[1]))
+        pr=float(row[1])
+        pr1.append(float(row[1]))
         diff.append(abs(mvav[i]-pr))
-        #relation.append((abs(mvav[i]-pr)*abs(mvav[i]-pr)*abs(mvav[i]-pr))-((8*(mvav[i]+pr)*(mvav[i]+pr)*(mvav[i]+pr))/27))
-        #relation.append((mvav[i]*mvav[i]*abs(mvav[i]-pr)*abs(mvav[i]-pr))/math.sqrt(pr))
-        #relation.append((mvav[i]*abs(mvav[i]-pr))/pr)
-        #relation.append(abs(mvav[i]-pr)/(mvav[i]*pr))
-        #relation.append(abs(mvav[i]-pr)*(mvav[i]+(1/pr)))
-        #relation.append(abs(math.pow(mvav[i], 1.05) - math.sqrt(pr)))
-        #relation.append((mvav[i]-pr)/pr)
-        #relation.append((mvav[i]-pr)/mvav[i])
-        #relation.append((mvav[i]-pr)/(mvav[i] * pr))
-        a1=math.sqrt(math.pow(mvav[i], 2) + math.pow(1/pr, 2))
-        b1=math.sqrt(math.pow(1/pr, 2) + math.pow(mvav[i]-pr, 2))
-        c1=math.sqrt(math.pow(mvav[i]-pr, 2) + math.pow(mvav[i], 2))
-        sep1=(a1+b1+c1)/2
-        relation.append(math.sqrt(sep1*(sep1-a1)*(sep1-b1)*(sep1-c1)))
+        x1=float(mvav[i])
+        y1=float(1/pr)
+        z1=float(mvav[i]-pr)
+        a1=math.sqrt(y1*y1 + z1*z1 + z1*y1)
+        b1=math.sqrt(z1*z1 + x1*x1 + z1*x1)
+        c1=math.sqrt(x1*x1 + y1*y1 + x1*y1)
+        s11=(a1+b1+c1)/2
+        s=math.sqrt(s11*(s11-a1)*(s11-b1)*(s11-c1))
+        relation.append(s)
         i+=1
 csvFile.close()
 
@@ -96,27 +91,28 @@ plt.savefig(f'{z}/difference_plot.png')
 plt.figure()
 plt.plot([x for x in range(1, len(relation)+1)], relation, 'ro', markersize=0.6)
 plt.savefig(f'{z}/relation_plot.png')
-
-relation1=relation[:]
-rel=sorted(relation1, reverse=True)
-g=open(f'{z}/best_results.txt', 'a+')
-coun=0
-for i in range(len(rel)):
-    p=relation1.index(rel[i])
-    relation1[p]=-1
-    if pr1[p]<(mean1):
-        coun+=1
-        g.write(str(coun) + '    ' + str(p+1) + '    ' + str(rel[i]) + '    ' + str(pr1[p]))
-        for a in range(3):
-            s2=''
-            for l in range(window_s):
-                s2+=amino[a][p+l]
-            g.write('   ' + s2)
-        g.write('\n')
-g.close()
-print(relation1)
+sts=[]
+rel=sorted(relation, reverse=True)
+with open(f'{z}/best_results.csv', 'a+', newline='') as csvFile:
+    writer=csv.writer(csvFile)
+    writer.writerow(['Rank', 'Start', 'Score', 'PV', 'Peptide 1', 'Peptide 2', 'Peptide 3'])
+    for i in range(len(rel)):
+        p=relation.index(rel[i])
+        relation[p]=-1
+        if pr1[p]<=mean1 and mvav[p] >= pr1[p]:
+        #if mvav[p] >= pr1[p]:
+            for a in range(3):
+                s2=''
+                for l in range(window_s):
+                    s2+=amino[a][p+l]
+                sts.append(s2)
+            writer.writerow([str(i+1), str(p+1), str(rel[i]), str(pr1[p]), sts[0], sts[1], sts[2]])
+            sts=[]
+csvFile.close()
+#print(mean1)
 max1=rel[0]
-start=relation.index(rel[0])
-for a in range(3):
-    s2=amino[a][start: start+window_s]
-    print(s2)
+#start=relation.index(rel[0])
+#for a in range(3):
+ #   s2=amino[a][start: start+window_s]
+  #  print(s2)
+print(len(mvav))
